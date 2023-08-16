@@ -1,5 +1,9 @@
 #  SHOTEXT (ALPHA)
-O aplicativo "Shotext" é uma ferramenta que combina a captura de tela com tecnologia OCR para extrair texto de imagens e, em seguida, copiá-lo automaticamente para a área de transferência. Com uma interface simples e intuitiva, os usuários podem capturar informações visuais, como textos em imagens, e transformá-las em texto editável com facilidade, agilizando tarefas como transcrição, pesquisa e coleta de dados. Isso oferece uma maneira eficaz e produtiva de transformar informações visuais em conteúdo de texto utilizável.
+Ideia (resumo)
+-
+Tive a ideia de criar o Shotext quando estava assistindo as aulas da faculdade à distância e vi que eu estava pausando muito os videos para fazer algumas anotações, e isso estava me deixando frustrado, então fui a procura de um programa que facilitasse essa tarefa apenas tirando print da tela, mas infelizmente eu não achei, então por incrivel que pareça me veio a ideia de eu mesmo criar meu proprio app que faça isso por mim, não demorou muito até a primeira versão ficar pronta, apenas pensei que juntar uma biblioteca que tire print e uma que transforma imagens em texto já resolveria, e não é que funcionou? tive alguns problemas no começo pois não sou muito familiarizado com o python, porém no final deu tudo certo.
+
+o SHOTEXT ainda não é 100% funcional, podendo não funcionar em Mac e Linux, porém pretendo atualizar futuramente para que seja 100% disponivel ao publico que se encontram no mesmo problema que eu.
 # Instruções para Usuários
 Seja bem-vindo ao Aplicativo de Captura e Conversão de Texto (SHOTEXT) usando Tesseract!
 
