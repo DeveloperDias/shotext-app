@@ -19,24 +19,24 @@ def get_resource_path(relative_path):
 image_icon_path = get_resource_path(r"assets/icon.png")
 image_icon = Image.open(image_icon_path)
 screenshot_url = get_resource_path(r"assets/screenshot.png")
-language = "por"
+
+
+class Language:
+    def __init__(self):
+        self.actual_language = None
+
+    def change_actual_language(self, new_actual_language):
+        self.actual_language = new_actual_language
+
+
+app_language = Language()
 
 
 def img_to_string():
     image = cv2.imread(screenshot_url)
     path = r"C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
     pytesseract.pytesseract.tesseract_cmd = path
-    return pytesseract.image_to_string(image, lang=language)
-
-
-def error_notification(title, message, app_name, icon_path, timeout):
-    notification.notify(
-        title=title,
-        message=message,
-        app_name=app_name,
-        app_icon=icon_path,
-        timeout=timeout
-    )
+    return pytesseract.image_to_string(image, lang=app_language.actual_language)
 
 
 def cut_image():
@@ -48,18 +48,20 @@ def cut_image():
         im_cropped = im[int(roi[1]):int(roi[1] + roi[3]), int(roi[0]):int(roi[0] + roi[2])]
         cv2.imwrite(screenshot_url, im_cropped)
         image_in_string = img_to_string()
-        if image_in_string == "":
-            error_notification(
-                "Erro ao copiar imagem",
-                "Ocorreu um erro ao copiar a imagem, tente novamente (selecione uma imagem com texto)",
-                "Shotext",
-                "favicon.ico",
-                2
+        if not image_in_string:
+            notification.notify(
+                title="Erro ao copiar imagem",
+                message="Ocorreu um erro ao copiar a imagem, tente novamente (selecione uma imagem com texto)",
+                app_name="Shotext",
+                app_icon=get_resource_path("favicon.ico"),
+                timeout=2,
+                toast=False,
+                ticker="teste"
             )
         else:
             copy(image_in_string)
     except Exception as e:
-        print(f"Error: {e}")
+        copy(f"Error: {e}")
     finally:
         cv2.destroyAllWindows()
 
@@ -77,17 +79,16 @@ def on_press_key():
 def app_handle(icon_app, item):
     if str(item) == "Screenshot":
         on_press_key()
-    elif str(item) == "Exit":
+    if str(item) == "Exit":
         icon_app.stop()
         sys.exit()
 
 
 def change_language(_, item):
-    global language
-    if str(item) == "pt-br":
-        language = "pt-br"
-    elif str(item) == "eng":
-        language = "eng"
+    if str(item) == "Portuguese":
+        app_language.change_actual_language("por")
+    elif str(item) == "English":
+        app_language.change_actual_language("eng")
 
 
 languages_submenu = pystray.Menu(
@@ -102,4 +103,6 @@ icon = pystray.Icon("Shotext", image_icon, menu=pystray.Menu(
 ))
 
 keyboard.add_hotkey("ctrl+[", on_press_key)
-icon.run()
+
+if __name__ == "__main__":
+    icon.run()
