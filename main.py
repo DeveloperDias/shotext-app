@@ -7,6 +7,7 @@ import pystray
 import sys
 from PIL import Image
 import os
+from plyer import notification
 
 
 def get_resource_path(relative_path):
@@ -28,16 +29,35 @@ def img_to_string():
     return pytesseract.image_to_string(image, lang=language)
 
 
+def error_notification(title, message, app_name, icon_path, timeout):
+    notification.notify(
+        title=title,
+        message=message,
+        app_name=app_name,
+        app_icon=icon_path,
+        timeout=timeout
+    )
+
+
 def cut_image():
     try:
         im = cv2.imread(screenshot_url)
         cv2.namedWindow("Select ROI", cv2.WND_PROP_FULLSCREEN)
         cv2.setWindowProperty("Select ROI", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
-        roi = cv2.selectROI("Select ROI", im)
+        roi = cv2.selectROI("Select ROI", im, showCrosshair=False)
         im_cropped = im[int(roi[1]):int(roi[1] + roi[3]), int(roi[0]):int(roi[0] + roi[2])]
         cv2.imwrite(screenshot_url, im_cropped)
         image_in_string = img_to_string()
-        copy(image_in_string)
+        if image_in_string == "":
+            error_notification(
+                "Erro ao copiar imagem",
+                "Ocorreu um erro ao copiar a imagem, tente novamente (selecione uma imagem com texto)",
+                "Shotext",
+                "favicon.ico",
+                2
+            )
+        else:
+            copy(image_in_string)
     except Exception as e:
         print(f"Error: {e}")
     finally:
