@@ -1,5 +1,6 @@
 {
-    "language": "por",
-    "shortcut": "ctrl + [",
-    "notifications": false
+    "language": "eng",
+    "shortcut": "ctrl+[",
+    "notifications": true,
+    "title": ""
 }
