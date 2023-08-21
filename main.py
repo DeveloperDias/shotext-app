@@ -1,16 +1,17 @@
 import sys
 import os
+import tkinter as tk
+from tkinter import messagebox
+import json
 import pytesseract
 import keyboard
 import pystray
 import cv2
-import tkinter as tk
-from tkinter import messagebox
-import json
 import pyautogui
 from pyperclip import copy
 from PIL import Image
 from plyer import notification
+
 
 
 def get_resource_path(relative_path):
@@ -23,11 +24,16 @@ class AppConfig:
     def __init__(self):
         self.config_json = get_resource_path("config.json")
         self.is_running_app = False
+        self.is_running_shortcut_window = False
         self.icon_title = f"{'Shotext' if not self.get_config_json('title') else self.get_config_json('title')}"
+
+    def set_is_running_shortcut_window(self, state: bool):
+        self.is_running_shortcut_window = state
+    def get_is_running_shortcut_window(self):
+        return self.is_running_shortcut_window
 
     def set_is_running_app(self, state: bool):
         self.is_running_app = state
-
     def get_is_running_app(self):
         return self.is_running_app
 
@@ -61,54 +67,60 @@ class AppConfig:
 
 config = AppConfig()
 
-
 def create_shortcut_window():
-    shortcut_window = tk.Tk()
-    shortcut_window.resizable(False, False)
-    shortcut_window.title("Redefinir Atalhos")
+    if not config.get_is_running_shortcut_window():
 
-    def on_submit():
-        new_shortcut = new_shortcut_entry.get()
-        try:
-            if new_shortcut == "":
-                messagebox.showwarning("Aviso", "Digite um novo atalho")
-                return
-            keyboard.add_hotkey(new_shortcut, on_press_key)
-            if new_shortcut:
-                keyboard.remove_hotkey(on_press_key)
+        config.set_is_running_shortcut_window(True)
+
+        shortcut_window = tk.Tk()
+        shortcut_window.resizable(False, False)
+        shortcut_window.title("Redefinir Atalhos")
+
+        def on_submit():
+            new_shortcut = new_shortcut_entry.get()
+            try:
+                if new_shortcut == "":
+                    messagebox.showwarning("Aviso", "Digite um novo atalho")
+                    return
                 keyboard.add_hotkey(new_shortcut, on_press_key)
-                config.set_config_json("shortcut", new_shortcut)
-                shortcut_window.destroy()
-        except Exception as e:
-            messagebox.showwarning("Aviso", "Atalho Desconhecido")
-            print(e)
+                if new_shortcut:
+                    keyboard.remove_hotkey(on_press_key)
+                    keyboard.add_hotkey(new_shortcut, on_press_key)
+                    config.set_config_json("shortcut", new_shortcut)
+                    shortcut_window.destroy()
+            except Exception as e:
+                messagebox.showwarning("Aviso", "Atalho Desconhecido")
+                print(e)
 
-    def on_exit():
-        shortcut_window.destroy()
+        def on_exit():
+            shortcut_window.destroy()
+            config.set_is_running_shortcut_window(False)
 
-    # Centralizando a janela
-    window_width = 200
-    window_height = 180
-    screen_width = shortcut_window.winfo_screenwidth()
-    screen_height = shortcut_window.winfo_screenheight()
-    x = (screen_width - window_width) // 2
-    y = (screen_height - window_height) // 2
-    shortcut_window.geometry(f"{window_width}x{window_height}+{x}+{y}")
+        shortcut_window.protocol("WM_DELETE_WINDOW", on_exit)
+        # Centralizando a janela
+        window_width = 200
+        window_height = 180
+        screen_width = shortcut_window.winfo_screenwidth()
+        screen_height = shortcut_window.winfo_screenheight()
+        x = (screen_width - window_width) // 2
+        y = (screen_height - window_height) // 2
+        shortcut_window.geometry(f"{window_width}x{window_height}+{x}+{y}")
 
-    label = tk.Label(shortcut_window, text="New shortcut:")
-    label.pack_configure(pady=10)
+        label = tk.Label(shortcut_window, text="New shortcut:")
+        label.pack_configure(pady=10)
 
-    new_shortcut_entry = tk.Entry(shortcut_window, width=18)
-    new_shortcut_entry.pack_configure(pady=5)
+        new_shortcut_entry = tk.Entry(shortcut_window, width=18)
+        new_shortcut_entry.pack_configure(pady=5)
 
-    submit_button = tk.Button(shortcut_window, text="Save", command=on_submit, width=15)
-    submit_button.pack_configure(pady=5)
+        submit_button = tk.Button(shortcut_window, text="Save", command=on_submit, width=15)
+        submit_button.pack_configure(pady=5)
 
-    exit_button = tk.Button(shortcut_window, text="Cancel", command=on_exit, width=15)
-    exit_button.pack_configure(pady=0)
+        exit_button = tk.Button(shortcut_window, text="Cancel", command=on_exit, width=15)
+        exit_button.pack_configure(pady=0)
 
-    return shortcut_window
-
+        return shortcut_window
+    else:
+        messagebox.showwarning("Aviso", "Janela em andamento")
 
 def open_shortcut_window():
     shortcut_window = create_shortcut_window()
