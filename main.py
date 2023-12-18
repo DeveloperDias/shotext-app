@@ -10,9 +10,16 @@ import cv2
 import pyautogui
 from pyperclip import copy
 from PIL import Image
-from plyer import notification
+from plyer import  notification
 
-
+def notify(title: string, msg: string):
+    notification.notify(
+        title=title,
+        message=string,
+        app_name="Shotext",
+        app_icon=get_resource_path("favicon.ico"),
+        timeout=2,
+    )
 
 def get_resource_path(relative_path):
     if hasattr(sys, "_MEIPASS"):
@@ -185,7 +192,6 @@ def cut_image():
         config.set_is_running_app(False)
         cv2.destroyAllWindows()
 
-
 def on_press_key():
     try:
         if not config.get_is_running_app():
@@ -278,3 +284,4 @@ keyboard.add_hotkey(config.get_config_json("shortcut"), on_press_key)
 
 if __name__ == "__main__":
     icon.run()
+
